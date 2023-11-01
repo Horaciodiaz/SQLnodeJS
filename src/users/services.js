@@ -5,32 +5,32 @@ const TABLE = 'users';
 
 const getAll = async () => {
     const { rows } = await pool.query(`select * from "${TABLE}"`);
-    return rows;
+    return rows.filter((user) => user.userState);
 }
-const getUser = async (id) => {
-    const { rows } = await pool.query(`select * from "${TABLE}" where "userID"=$1`, [id]);
+const getUser = async (tag) => {
+    const { rows } = await pool.query(`select * from "${TABLE}" where "userTag"=$1`, [tag]);
     return rows[0];
 }
 const createUser = async (user) => {
     const { rows } = await pool.query(`insert into "${TABLE}"(
-        "userID",
         "userName",
         "userEmail",
-        "userPhone") 
+        "userPhone",
+        "userTag") 
         values ($1, $2, $3, $4) 
         RETURNING *`, Object.values(user));
     return rows[0];
 }
-const updateUser = async (user, id) => {
+const updateUser = async (user, tag) => {
     try {
-        const preUser = getUser(id);
+        const preUser = getUser(tag);
         if(preUser){
             const { rows } = await pool.query(`UPDATE ${TABLE} 
                 SET "userName" = $1,
                     "userEmail" = $2, 
-                    "userPhone" = $3 
-                WHERE "userID" = ${id}
-                RETURNING *`, Object.values(user));
+                    "userPhone" = $3
+                WHERE "userTag" = $4
+                RETURNING *`, [...Object.values(user), tag]);
             return rows[0];
         }
         else return null;
@@ -39,13 +39,14 @@ const updateUser = async (user, id) => {
         return null;
     }
 }
-const deleteUser = async (id) => {
+const deleteUser = async (tag) => {
     try {
-        const user = getUser(id);
+        const user = getUser(tag);
         if(user){
-            const { rows } = await pool.query(`DELETE FROM ${TABLE}
-            WHERE "userID" = $1
-            RETURNING *`, [id])
+            const { rows } = await pool.query(`UPDATE ${TABLE}
+            SET "userState" = false
+            WHERE "userTag" = $1
+            RETURNING *`, [tag])
             return rows[0];
         }
         else return null;

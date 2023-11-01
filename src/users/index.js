@@ -8,10 +8,10 @@ const router = express.Router();
 module.exports.UserAPI = (app) => {
     router
         .get('/', UserController.getUsers)
-        .get('/:id', UserController.getUser)
+        .get('/:tag', UserController.getUser)
         .post('/',UserController.createUser)
-        .put('/:id',UserController.updateUser)
-        .delete('/:id',UserController.deleteUser)
+        .put('/:tag',UserController.updateUser)
+        .delete('/:tag',UserController.deleteUser)
     
     app.use('/api/users', router);
 }

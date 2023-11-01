@@ -16,8 +16,8 @@ module.exports.UserController = {
     },
     getUser: async (req, res) => {
         try {
-            const { params: { id }} = req;
-            const user = await UserService.getUser(id);
+            const { params: { tag }} = req;
+            const user = await UserService.getUser(tag);
             if(user) Response.success(res, 200, `Usuario: ${user.userName}`, user);
             else Response.error(res, httpError.NotFound());
         } catch (error) {
@@ -41,11 +41,11 @@ module.exports.UserController = {
     },
     updateUser: async (req, res) => {
         try {
-            const { params: { id }, body } = req;
+            const { params: { tag }, body } = req;
             if (!body || Object.keys(body).length === 0)
                 Response.error(res, new httpError.BadRequest());
             else {
-                const updated = await UserService.updateUser(body, id);
+                const updated = await UserService.updateUser(body, tag);
                 if (updated)
                     Response.success(res, 200, "Usuario Actualizado", updated);
                 else
@@ -58,8 +58,8 @@ module.exports.UserController = {
     },
     deleteUser: async (req, res) => {
         try {
-            const {params: { id }} = req;
-            const deleted = await UserService.deleteUser(id);
+            const {params: { tag }} = req;
+            const deleted = await UserService.deleteUser(tag);
             if(deleted) 
                 Response.success(res, 200, "Usuario Eliminado", deleted);
             else 
